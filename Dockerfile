@@ -76,8 +76,8 @@ RUN activate py3
 #########################################
 WORKDIR /home/coder/project
 
-wget https://github.com/cdr/code-server/releases/download/1.1156-vsc1.33.1/code-server1.1156-vsc1.33.1-linux-x64.tar.gz
-tar -xvzf code-server1.1156-vsc1.33.1-linux-x64.tar.gz
+RUN wget https://github.com/cdr/code-server/releases/download/1.1156-vsc1.33.1/code-server1.1156-vsc1.33.1-linux-x64.tar.gz
+RUN tar -xvzf code-server1.1156-vsc1.33.1-linux-x64.tar.gz
 #COPY ./code-server /usr/local/bin/code-server
 RUN chmod +x /usr/local/bin/code-server
 
