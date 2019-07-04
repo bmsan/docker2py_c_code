@@ -55,6 +55,8 @@ ENV PATH="/home/coder/conda/miniconda/bin:${PATH}"
 
 RUN conda create -n py3 python=3.6
 
+RUN activate py3 
+
 RUN pip install cffi
 RUN pip install numpy
 RUN pip install pillow 
@@ -65,22 +67,25 @@ RUN pip install matplotlib
 RUN pip install pyyaml
 RUN pip install tqdm
 RUN pip install typing
+RUN pip install pylint 
 
 
-RUN activate py3 
 
 
 
 ##########################################
 ########## SETUP Visual Studio Code
 #########################################
-WORKDIR /home/coder/project
+WORKDIR /home/coder
 
 RUN wget https://github.com/cdr/code-server/releases/download/1.1156-vsc1.33.1/code-server1.1156-vsc1.33.1-linux-x64.tar.gz
 RUN tar -xvzf code-server1.1156-vsc1.33.1-linux-x64.tar.gz
-RUN mv  code-server1.1156-vsc1.33.1-linux-x64/code-server ./usr/local/bin/code-server
+RUN mv  code-server1.1156-vsc1.33.1-linux-x64/code-server /usr/local/bin/code-server
 #COPY ./code-server /usr/local/bin/code-server
 RUN chmod +x /usr/local/bin/code-server
+
+
+WORKDIR /home/coder/project
 
 RUN code-server --install-extension ms-vscode.cpptools
 RUN code-server --install-extension ms-python.python
