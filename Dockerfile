@@ -95,8 +95,9 @@ RUN code-server --install-extension twxs.cmake
 RUN echo $(cat ~/.config/code-server/config.yaml)
 
 COPY --chown=coder ./start.sh /home/coder/start.sh
+RUN chmod +x /home/coder/start.sh
 
 SHELL ["/bin/bash", "-c"]
 
-ENTRYPOINT ["dumb-init", "start.sh"]
+ENTRYPOINT ["dumb-init", "/home/coder/start.sh"]
 #ENTRYPOINT ["dumb-init", "/bin/bash"]
