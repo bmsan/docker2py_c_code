@@ -1,0 +1,19 @@
+name: py3
+channels:
+  - pytorch
+  - fragcolor
+  - anaconda
+  - defaults
+dependencies:
+  - python=3.8.5
+  - cffi
+  - numpy
+  - pillow
+  - pytorch
+  - jupyter
+  - pip:
+    - matplotlib
+    - pyyaml
+    - tqdm
+    - typing
+    - pylint

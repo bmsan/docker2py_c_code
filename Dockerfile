@@ -25,7 +25,7 @@ ENV LC_ALL=en_US.UTF-8
 
 
 
-RUN apt-get update &&  apt-get -y install gcc g++ cmake
+RUN apt-get -y install gcc
 
 # http://packages.ubuntu.com/de/trusty/valgrind
 RUN apt-get -y install valgrind
@@ -53,44 +53,50 @@ RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -
 RUN bash /home/coder/conda/miniconda.sh -b -p /home/coder/conda/miniconda
 ENV PATH="/home/coder/conda/miniconda/bin:${PATH}"
 
-RUN conda create -n py3 python=3.6
+COPY ./pyenv.yml /home/coder/conda/pyenv.yml
+
+RUN conda env create -f /home/coder/conda/pyenv.yml
 
 RUN activate py3 
 
-RUN pip install cffi
-RUN pip install numpy
-RUN pip install pillow 
-RUN conda install pytorch-cpu torchvision-cpu -c pytorch
-RUN pip install jupyter
-RUN pip install pip
-RUN pip install matplotlib
-RUN pip install pyyaml
-RUN pip install tqdm
-RUN pip install typing
-RUN pip install pylint 
-
-
-
-
+RUN sudo apt-get -y install g++
+RUN sudo apt-get -y install lldb 
+RUN sudo apt-get -y install cmake
 
 ##########################################
 ########## SETUP Visual Studio Code
 #########################################
+
+
+RUN mkdir -p ~/.local/lib ~/.local/bin
+RUN curl -fL https://github.com/cdr/code-server/releases/download/v3.4.1/code-server-3.4.1-linux-amd64.tar.gz \
+  | tar -C ~/.local/lib -xz
+RUN mv ~/.local/lib/code-server-3.4.1-linux-amd64 ~/.local/lib/code-server-3.4.1
+RUN ln -s ~/.local/lib/code-server-3.4.1/bin/code-server ~/.local/bin/code-server
+ENV PATH="/home/coder/.local/bin:${PATH}"
+
+ENV SHELL /bin/bash
+
+
 WORKDIR /home/coder
+RUN echo $(echo "source activate py3" >> /home/coder/.bashrc)
+COPY  --chown=coder ./settings.json ./.local/share/code-server/User/settings.json
 
-RUN wget https://github.com/cdr/code-server/releases/download/1.1156-vsc1.33.1/code-server1.1156-vsc1.33.1-linux-x64.tar.gz
-RUN tar -xvzf code-server1.1156-vsc1.33.1-linux-x64.tar.gz
-RUN sudo mv  code-server1.1156-vsc1.33.1-linux-x64/code-server /usr/local/bin/code-server
-#COPY ./code-server /usr/local/bin/code-server
-RUN sudo chmod +x /usr/local/bin/code-server
-
-
-WORKDIR /home/coder/project
-
+RUN code-server --version
 RUN code-server --install-extension ms-vscode.cpptools
-RUN code-server --install-extension ms-python.python
-RUN code-server --install-extension vector-of-bool.cmake-tools
+RUN code-server --install-extension ms-python.python@2020.5.86806
+RUN code-server --install-extension ms-vscode.cmake-tools
 RUN code-server --install-extension twxs.cmake
 
+#RUN code-server
+#COPY ./config.yaml /home/coder/.config/code-server/config.yaml
+#COPY --chown=coder ./test1  /home/coder/project2
 
-ENTRYPOINT ["dumb-init", "code-server"]
+RUN echo $(cat ~/.config/code-server/config.yaml)
+
+COPY --chown=coder ./start.sh /home/coder/start.sh
+
+SHELL ["/bin/bash", "-c"]
+
+ENTRYPOINT ["dumb-init", "start.sh"]
+#ENTRYPOINT ["dumb-init", "/bin/bash"]
